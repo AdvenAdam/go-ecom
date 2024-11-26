@@ -1,4 +1,4 @@
-module github.com/AdvenAdam/ecom
+module github.com/AdvenAdam/go-ecom
 
 go 1.22.5
 

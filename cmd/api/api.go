@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/AdvenAdam/ecom/service/user"
+	"github.com/AdvenAdam/go-ecom/service/user"
 	"github.com/gorilla/mux"
 )
 

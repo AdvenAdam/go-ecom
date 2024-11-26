@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/AdvenAdam/ecom/cmd/api"
+	"github.com/AdvenAdam/go-ecom/cmd/api"
 )
 
 func main() {
