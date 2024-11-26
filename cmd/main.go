@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/AdvenAdam/go-ecom/cmd/api"
@@ -22,8 +23,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	server := api.NewAPIServer(":8080", db)
+	port := fmt.Sprintf(":%s", config.Envs.Port)
+	server := api.NewAPIServer(port, db)
 	if err := server.Run(); err != nil {
 		log.Fatal(err)
 	}
