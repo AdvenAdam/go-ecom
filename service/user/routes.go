@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AdvenAdam/go-ecom/config"
 	"github.com/AdvenAdam/go-ecom/service/auth"
 	"github.com/AdvenAdam/go-ecom/types"
 	"github.com/AdvenAdam/go-ecom/utils"
@@ -25,7 +26,42 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
+	// - get request body
+	var payload types.LoginUserPayload
 
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// - validate payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload: %v", errors))
+		return
+	}
+
+	// - validate User Exists
+	user, err := h.store.GetUserByEmail(payload.Email)
+	if err != nil {
+		// error came from GetUserByEmail function
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s not found", payload.Email))
+		return
+	}
+	// - validate password
+	if !auth.ComparePassword(user.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found or invalid password"))
+		return
+	}
+	// - generate token
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWTToken(secret, user.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
