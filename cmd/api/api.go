@@ -23,7 +23,14 @@ func NewAPIServer(addr string, db *sql.DB) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := mux.NewRouter()
+	// We define a subrouter for all routes that start with "/api/v1". This
+	// allows us to have a clear separation of concerns between the API and
+	// any other routes that may be defined in the future.
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
+
+	// We create a new user store using the database connection provided by
+	// the user. This allows us to decouple the user store from the database
+	// connection and make it easier to test.
 	userStore := user.NewStore(s.db)
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(subRouter)
