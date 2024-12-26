@@ -42,6 +42,43 @@ func (s *Store) CreateProduct(product *types.Product) error {
 	return nil
 }
 
+// GetProductByIDs retrieves a list of products from the database by their IDs.
+// It accepts a slice of product IDs and returns a slice of Product objects
+// corresponding to those IDs, or an error if the query fails.
+
+func (s *Store) GetProductByIDs(productIDs []int) ([]types.Product, error) {
+	args := make([]interface{}, len(productIDs))
+	for i, v := range productIDs {
+		args[i] = v
+	}
+
+	rows, err := s.db.Query("SELECT * FROM products WHERE id IN (?)", args...)
+	if err != nil {
+		return nil, err
+	}
+
+	products := make([]types.Product, 0)
+
+	for rows.Next() {
+		p, err := scanRowIntoProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, *p)
+	}
+
+	return products, nil
+}
+
+func (s *Store) UpdateProduct(product types.Product) error {
+	_, err := s.db.Exec("UPDATE products SET name = ?, price = ?, image = ?, description = ?, quantity = ? WHERE id = ?", product.Name, product.Price, product.Image, product.Description, product.Quantity, product.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func scanRowIntoProduct(rows *sql.Rows) (*types.Product, error) {
 	product := new(types.Product)
 

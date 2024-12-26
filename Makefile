@@ -77,6 +77,7 @@ help:
 	@echo "  make build: Build the application"
 	@echo "  make test: Run tests"
 	@echo "  make clean: Clean build artifacts"
+	@echo "  make stop: Stop the application"
 	@echo "  make run: Run the application with gowatch"
 	@echo "  make migration <name>: Create a new migration"
 	@echo "  make migrate-up: Run migrations up"

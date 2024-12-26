@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/AdvenAdam/go-ecom/service/cart"
+	"github.com/AdvenAdam/go-ecom/service/order"
 	"github.com/AdvenAdam/go-ecom/service/product"
 	"github.com/AdvenAdam/go-ecom/service/user"
 	"github.com/gorilla/mux"
@@ -39,6 +41,10 @@ func (s *APIServer) Run() error {
 	productStore := product.NewStore(s.db)
 	productHandler := product.NewHandler(productStore)
 	productHandler.RegisterRoutes(subRouter)
+
+	orderStore := order.NewStore(s.db)
+	cartHandler := cart.NewHandler(productStore, orderStore, userStore)
+	cartHandler.RegisterRoutes(subRouter)
 
 	log.Println("Listening on port", s.addr)
 
